@@ -7,6 +7,7 @@ jobs:
   deploy:
     name: "CI/CD"
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Checkout
@@ -28,9 +29,17 @@ jobs:
         working-directory: environments/dev
 
       - name: Plan
-        run: terraform plan -out-tfplan
+        run: |
+          terraform plan \
+          -var="aws_region=${{vars.AWS_REGION }}" \
+          -var="instance_count=${{vars.INSTANCE_COUNT }}" \
+          -var="enable_monitoring=${{vars.ENABLE_MONITORING }}" \
         working-directory: environments/dev
 
       - name: Apply
-        run: terraform apply "tfplan"
+        run: |
+          terraform apply -auto-approve \
+          -var="aws_region=${{vars.AWS_REGION }}" \
+          -var="instance_count=${{vars.INSTANCE_COUNT }}" \
+          -var="enable_monitoring=${{vars.ENABLE_MONITORING }}" \
         working-directory: environments/dev
